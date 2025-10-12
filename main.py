@@ -42,6 +42,7 @@ async def dialogflow_webhook(request: Request):
     body = await request.json()
 
     try:
+        intent_name = body["queryResult"]["intent"]["displayName"]
         params = body["queryResult"]["parameters"]
         place_type = params["place_type"]
         location = params["location"]
