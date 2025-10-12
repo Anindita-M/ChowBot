@@ -1,5 +1,4 @@
 fastapi
 uvicorn[standard]
 dotenv
-os
 httpx
