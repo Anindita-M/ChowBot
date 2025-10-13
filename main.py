@@ -78,7 +78,7 @@ async def dialogflow_webhook(request: Request):
         if not response:
             return JSONResponse({f"fulfilment_text":"No places found near {location}"})
         
-        results = response["results"]
+        results = response.json()["results"]
 
         message = f"Here are some places in location {location}"
         
