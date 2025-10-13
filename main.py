@@ -13,7 +13,7 @@ FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
 GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
 headers = {"accept": "application/json",
-           "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
+           "Authorization": FOURSQUAREAPIKEY,
            "X-Places-Api-Version": "2025-06-17"}
 
 print(headers)
