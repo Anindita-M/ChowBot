@@ -13,7 +13,8 @@ FOURSQUAREAPIKEY = os.getenv("FOUR_SQUARE_API_KEY")
 GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
 headers = {"Accept": "application/json",
-           "Authorization": FOURSQUAREAPIKEY}
+           "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
+           "X-Places-Api-Version": "2025-06-17"}
 
 @app.post("/maps.googleapis.com/maps/api/geocode/json")
 async def geocode(location:str,key:str=GOOGLEGEOCODEAPIKEY):
@@ -63,7 +64,7 @@ async def dialogflow_webhook(request: Request):
             "ll" : f"{lat},{lon}",
             "radius" : 10000,
             "limit" : 5,
-            "sort" : "rating"
+            "sort" : "RATING"
         }
 
         async with httpx.AsyncClient() as client:
