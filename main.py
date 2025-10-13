@@ -12,7 +12,7 @@ load_dotenv()
 FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
 GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
-headers = {"Accept": "application/json",
+headers = {"accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
 
