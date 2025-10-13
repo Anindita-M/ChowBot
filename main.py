@@ -91,7 +91,15 @@ async def dialogflow_webhook(request: Request):
             curr_place = f"•{name} :- {location}\n"
             message += curr_place
 
-        return message
+        return JSONResponse(content={
+        "fulfillmentMessages": [
+            {
+                "text": {
+                    "text": [message]
+                }
+            }
+        ]
+    })
     
     except Exception as e:
         return JSONResponse({
