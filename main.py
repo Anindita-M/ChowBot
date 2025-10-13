@@ -85,16 +85,10 @@ async def dialogflow_webhook(request: Request):
         for place in results:
             
             curr_place = ""
-            location = place["location"]["address"] + place["location"]["locality"] + place["location"]["region"]
-            hours = place["hours"]["display"]
-            open_now = place["hours"]["open_now"]
+            location = place["location"]["formatted_address"]
             name = place["name"]
-            link = place["link"]
-            price = place["price"]
-            rating = place["rating"]
-            description = place["description"]
 
-            curr_place = f"•{name} :- {location}\n{description}\n{link}\n{price}\n{rating}\n{hours}\n{open_now}"
+            curr_place = f"•{name} :- {location}\n"
             message += curr_place
 
         return message
