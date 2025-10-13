@@ -101,7 +101,7 @@ async def dialogflow_webhook(request: Request):
     
     except Exception as e:
         return JSONResponse({
-            "fulfilmentText": "Someting went wrong processing your request."
+            "fulfilmentText": f"Someting went wrong processing your request.{response.json()}"
         })
 
 
