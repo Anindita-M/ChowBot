@@ -73,7 +73,7 @@ async def dialogflow_webhook(request: Request):
             response = await client.get("https://places-api.foursquare.com/places/search", headers=headers, params=query_params)
 
         if response.status_code!=200:
-            return JSONResponse({"fulfilment_text":f"Error from FourSquareAPI, {response.status_code}"})
+            return JSONResponse({"fulfilment_text":f"Error from FourSquareAPI, {headers}, {query_params}"})
 
         if not response:
             return JSONResponse({f"fulfilment_text":"No places found near {location}"})
