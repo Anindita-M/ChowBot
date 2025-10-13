@@ -13,7 +13,7 @@ FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
 GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
 headers = {"accept": "application/json",
-           "Authorization": FOURSQUAREAPIKEY,
+           "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
 
 print(headers)
@@ -70,7 +70,7 @@ async def dialogflow_webhook(request: Request):
         }
 
         async with httpx.AsyncClient() as client:
-            response = await client.get("https://places-api.foursquare.com/places/search", params=query_params,headers=headers)
+            response = await client.get("https://places-api.foursquare.com/places/search", headers=headers, params=query_params)
 
         if response.status_code!=200:
             return JSONResponse({"fulfilment_text":f"Error from FourSquareAPI, {response.status_code}"})
