@@ -9,12 +9,14 @@ app = FastAPI()
 
 load_dotenv()
 
-FOURSQUAREAPIKEY = os.getenv("FOUR_SQUARE_API_KEY")
+FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
 GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
 headers = {"Accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
+
+print(headers)
 
 @app.post("/maps.googleapis.com/maps/api/geocode/json")
 async def geocode(location:str,key:str=GOOGLEGEOCODEAPIKEY):
@@ -46,7 +48,7 @@ async def dialogflow_webhook(request: Request):
         intent_name = body["queryResult"]["intent"]["displayName"]
         params = body["queryResult"]["parameters"]
         cuisine = params["cuisine"]
-        location = f"{params["location"]["street-address"]},{params["location"]["city"]},{params["location"]["country"]}"
+        location = f"{params['location']['street-address']},{params['location']['city']},{params['location']['country']}"
 
         if not location or not cuisine:
             return JSONResponse({"fulfilment_text":"Please enter a location and a place type"})
