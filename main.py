@@ -50,7 +50,7 @@ async def dialogflow_webhook(request: Request):
         intent_name = body["queryResult"]["intent"]["displayName"]
         params = body["queryResult"]["parameters"]
         cuisine = params["cuisine"]
-        location = f"{params['location']['street-address']},{params['location']['subadmin-area']}{params['location']['city']},{params['location']['country']}"
+        location = f"{params['location']['street-address']},{params['location']['business-name']}{params['location']['subadmin-area']}{params['location']['city']},{params['location']['country']}"
 
         if not location or not cuisine:
             return JSONResponse({"fulfilment_text":"Please enter a location and a place type"})
@@ -89,7 +89,7 @@ async def dialogflow_webhook(request: Request):
             location = place["location"]["formatted_address"]
             name = place["name"]
 
-            message += f"• *{name}*\n_{address}_\n\n"
+            message += f"• *{name}*\n_{location}_\n\n"
 
         return JSONResponse(content={
         "fulfillmentMessages": [
