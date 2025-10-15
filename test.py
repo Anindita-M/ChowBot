@@ -1,42 +1,40 @@
+from dotenv import load_dotenv
+import os
+import google.auth
+import google.auth.transport.requests
 import httpx
+from fastapi import FastAPI
 import asyncio
 
-SERVICE_KEY = "Bearer 2IJJRA05HYC1JGHV0JALCCMAQ2RFAO41JJFQVNOFKSEXZNUM"  # Use same one that worked with requests
+load_dotenv()  # loads .env file
 
-async def search_places():
-    headers = {
-        "Authorization": SERVICE_KEY,
-        "accept": "application/json",
-        "X-Places-Api-Version": "2025-06-17"
-    }
+app = FastAPI()
 
-    params = {
-        "query": "Italian",
-        "ll": "18.9582,72.8321",
-        "radius": 10000,
-        "limit": 5,
-        "sort": "RATING"
-    }
+credentials, project = google.auth.default(
+    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+)
+credentials.refresh(google.auth.transport.requests.Request())
 
+access_token = credentials.token
+headers_geocoding = {"Authorization": f"Bearer {access_token}"}
+
+@app.post("/maps.googleapis.com/maps/api/geocode/json")
+async def geocode():
+    params = {"address": "Mumbai"}
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            "https://places-api.foursquare.com/places/search",
-            headers=headers,
+            "https://maps.googleapis.com/maps/api/geocode/json",
+            headers=headers_geocoding,
             params=params
         )
+        data = response.json()
 
-    if response.status_code == 401:
-        print("⚠️ 401 Unauthorized — headers may not be applied correctly.")
-        print("📤 Sent headers:", headers)
-        print("📤 Sent params:", params)
-        print("📩 Response:", response.text)
-        raise Exception("Unauthorized")
-    
-    print(response.json())
+        print(data)
+    if response.status_code == 200 and data["results"]:
+        loc = data["results"][0]["geometry"]["location"]
+        print(loc)
+        return loc["lat"], loc["lng"]
+    return None
 
-    return response.json()
-
-asyncio.run(search_places())
-
-
+asyncio.run(geocode())
 

@@ -7,20 +7,14 @@ import google.auth
 import google.auth.transport.requests
 import requests
 
-
 app = FastAPI()
 
 load_dotenv()
 
-credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-credentials.refresh(google.auth.transport.requests.Request())
-
-access_token = credentials.token
-
 FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
-#GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
+GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 
-headers_geocoding = {"Authorization": f"Bearer {access_token}"}
+#headers_geocoding = {"Authorization": f"Bearer {access_token}"}
 
 headers_foursquare = {"accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
@@ -30,10 +24,11 @@ headers_foursquare = {"accept": "application/json",
 async def geocode(location:str):
     
     params = {
-        "address" : location
+        "address" : location,
+        "key": GOOGLEGEOCODEAPIKEY
     }
     async with httpx.AsyncClient() as client:
-        response = await client.get("https://maps.googleapis.com/maps/api/geocode/json",headers=headers_geocoding,params=params)
+        response = await client.get("https://maps.googleapis.com/maps/api/geocode/json",params=params)
         data = response.json()
 
     if response.status_code==200 and data["results"]:
