@@ -80,7 +80,7 @@ async def dialogflow_webhook(request: Request):
         
         results = response.json()["results"]
 
-        message = f"Here are some places in location {location}"
+        message = f"Here are some places in location {location} \n"
         
         for place in results:
             
@@ -88,8 +88,8 @@ async def dialogflow_webhook(request: Request):
             location = place["location"]["formatted_address"]
             name = place["name"]
 
-            curr_place = f"•{name} :- {location}\n"
-            message += curr_place
+            curr_place = f"•{name} :- {location}"
+            message += curr_place + "\n"
 
         return JSONResponse(content={
         "fulfillmentMessages": [
