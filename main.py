@@ -3,30 +3,37 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 import httpx
+import google.auth
+import google.auth.transport.requests
+import requests
 
 
 app = FastAPI()
 
 load_dotenv()
 
-FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
-GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
+credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+credentials.refresh(google.auth.transport.requests.Request())
 
-headers = {"accept": "application/json",
+access_token = credentials.token
+
+FOURSQUAREAPIKEY = os.getenv("FOURSQUARE_API_KEY")
+#GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
+
+headers_geocoding = {"Authorization": f"Bearer {access_token}"}
+
+headers_foursquare = {"accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
 
-print(headers)
-
 @app.post("/maps.googleapis.com/maps/api/geocode/json")
-async def geocode(location:str,key:str=GOOGLEGEOCODEAPIKEY):
+async def geocode(location:str):
     
     params = {
-        "address" : location,
-        "key" : key
+        "address" : location
     }
     async with httpx.AsyncClient() as client:
-        response = await client.get("https://maps.googleapis.com/maps/api/geocode/json",params=params)
+        response = await client.get("https://maps.googleapis.com/maps/api/geocode/json",headers=headers_geocoding,params=params)
         data = response.json()
 
     if response.status_code==200 and data["results"]:
@@ -70,7 +77,7 @@ async def dialogflow_webhook(request: Request):
         }
 
         async with httpx.AsyncClient() as client:
-            response = await client.get("https://places-api.foursquare.com/places/search", headers=headers, params=query_params)
+            response = await client.get("https://places-api.foursquare.com/places/search", headers=headers_foursquare, params=query_params)
 
         if response.status_code!=200:
             return JSONResponse({"fulfilment_text":f"Error from FourSquareAPI, {response.json()}"})
