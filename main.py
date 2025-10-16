@@ -33,7 +33,7 @@ async def geocode(location:str):
         "address" : location,
         "key": GOOGLEGEOCODEAPIKEY
     }
-    async with httpx.AsyncClient(timeout=3.0) as client:
+    async with httpx.AsyncClient() as client:
         response = await client.get("https://maps.googleapis.com/maps/api/geocode/json",params=params)
         data = response.json()
 
@@ -76,7 +76,7 @@ async def dialogflow_webhook(request: Request):
             "sort" : "POPULARITY"
         }
 
-        async with httpx.AsyncClient(timeout=3.0) as client:
+        async with httpx.AsyncClient() as client:
             response = await client.get("https://places-api.foursquare.com/places/search", headers=headers_foursquare, params=query_params)
 
         if response.status_code!=200:
