@@ -108,7 +108,8 @@ async def process_dialogflow(body):
         return JSONResponse({
             "fulfilmentText": f"Someting went wrong processing your request.{results}"
         })
-    
+
+@app.post("/dialogflow_webhook")    
 @app.post("/dialogflow_webhook/")
 async def dialogflow_webhook(request: Request, background_tasks: BackgroundTasks):
     body = await request.json()
