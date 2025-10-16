@@ -115,15 +115,15 @@ async def dialogflow_webhook(request: Request, background_tasks: BackgroundTasks
     background_tasks.add_task(process_dialogflow, body)
 
     # Respond immediately so Dialogflow doesn’t time out
-    return JSONResponse(content={
-        "fulfillmentMessages": [
-            {
-                "text": {
-                    "text": ["Got it! Looking up places for you... 🍽️"]
-                }
-            }
-        ]
-    })
+    #return JSONResponse(content={
+     #   "fulfillmentMessages": [
+      #      {
+       #         "text": {
+        #            "text": ["Got it! Looking up places for you... 🍽️"]
+         #       }
+          #  }
+        #]
+    #})
 
 
 
