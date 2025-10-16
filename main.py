@@ -51,13 +51,17 @@ async def dialogflow_webhook(request: Request):
         params = body["queryResult"]["parameters"]
         cuisine = params["cuisine"]
         location = f"{params['location']['street-address']},{params['location']['business-name']}{params['location']['subadmin-area']}{params['location']['city']},{params['location']['country']}"
- 
+
+        if not location or not cuisine:
+            return JSONResponse({"fulfilment_text":"Please enter a location and a place type"})
+
         coords = await geocode(location)
-        lat, lon = coords
 
         if not coords:
 
             return JSONResponse({"fulfilment_text":f"Can't find {location}"})
+
+        lat, lon = coords
 
         query_params = {
             "query" : cuisine,
@@ -101,3 +105,7 @@ async def dialogflow_webhook(request: Request):
         return JSONResponse({
             "fulfilmentText": f"Someting went wrong processing your request.{results}"
         })
+
+
+
+
