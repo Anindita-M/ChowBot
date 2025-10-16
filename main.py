@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException, Depends, Request
+from fastapi import FastAPI, Query, HTTPException, Depends, Request, BackgroundTasks
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
@@ -19,6 +19,12 @@ GOOGLEGEOCODEAPIKEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
 headers_foursquare = {"accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
+
+def slow_task(data):
+
+    import time
+    time.sleep(10)
+    print("Finished slow task")
 
 @app.post("/maps.googleapis.com/maps/api/geocode/json")
 async def geocode(location:str):
@@ -41,10 +47,7 @@ async def geocode(location:str):
 async def root():
     return {"message":"Welcome to ChowBot! Search to find places to eat"}
 
-@app.post("/dialogflow/webhook")
-async def dialogflow_webhook(request: Request):
-
-    body = await request.json()
+async def process_dialogflow(body):
 
     try:
         intent_name = body["queryResult"]["intent"]["displayName"]
@@ -105,6 +108,23 @@ async def dialogflow_webhook(request: Request):
         return JSONResponse({
             "fulfilmentText": f"Someting went wrong processing your request.{results}"
         })
+    
+@app.post("/dialogflow_webhook")
+async def dialogflow_webhook(request: Request, background_tasks: BackgroundTasks):
+    body = await request.json()
+    background_tasks.add_task(process_dialogflow, body)
+
+    # Respond immediately so Dialogflow doesn’t time out
+    return JSONResponse(content={
+        "fulfillmentMessages": [
+            {
+                "text": {
+                    "text": ["Got it! Looking up places for you... 🍽️"]
+                }
+            }
+        ]
+    })
+
 
 
         
