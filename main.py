@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException, Depends, Request, BackgroundTasks
+from fastapi import FastAPI, Query, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
@@ -20,15 +20,9 @@ headers_foursquare = {"accept": "application/json",
            "Authorization": f"Bearer {FOURSQUAREAPIKEY}",
            "X-Places-Api-Version": "2025-06-17"}
 
-def slow_task(data):
-
-    import time
-    time.sleep(10)
-    print("Finished slow task")
-
 @app.post("/maps.googleapis.com/maps/api/geocode/json")
 async def geocode(location:str):
-    
+
     params = {
         "address" : location,
         "key": GOOGLEGEOCODEAPIKEY
@@ -40,7 +34,7 @@ async def geocode(location:str):
     if response.status_code==200 and data["results"]:
         loc = data["results"][0]["geometry"]["location"]
         return loc["lat"],loc['lng']
-    
+
     return None
 
 @app.get("/")
@@ -51,6 +45,7 @@ async def root():
 async def dialogflow_webhook(request: Request):
 
     body = await request.json()
+
     try:
         intent_name = body["queryResult"]["intent"]["displayName"]
         params = body["queryResult"]["parameters"]
@@ -59,15 +54,15 @@ async def dialogflow_webhook(request: Request):
 
         if not location or not cuisine:
             return JSONResponse({"fulfilment_text":"Please enter a location and a place type"})
-        
+
         coords = await geocode(location)
 
         if not coords:
 
             return JSONResponse({"fulfilment_text":f"Can't find {location}"})
-        
+
         lat, lon = coords
-        
+
         query_params = {
             "query" : cuisine,
             "ll" : f"{lat},{lon}",
@@ -84,13 +79,13 @@ async def dialogflow_webhook(request: Request):
 
         if not response:
             return JSONResponse({f"fulfilment_text":"No places found near {location}"})
-        
+
         results = response.json()["results"]
 
         message = [f"Here are some places in {location}: \n"]
-        
+
         for place in results:
-            
+
             location = place["location"]["formatted_address"]
             name = place["name"]
 
@@ -105,16 +100,8 @@ async def dialogflow_webhook(request: Request):
             }
         ]
     })
-    
+
     except Exception as e:
         return JSONResponse({
             "fulfilmentText": f"Someting went wrong processing your request.{results}"
         })
-
-
-
-
-        
-
-
-        
