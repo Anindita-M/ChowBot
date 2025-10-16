@@ -47,8 +47,10 @@ async def geocode(location:str):
 async def root():
     return {"message":"Welcome to ChowBot! Search to find places to eat"}
 
-async def process_dialogflow(body):
+app.post("/dialogflow/webhook")
+async def dialogflow_webhook(request: Request):
 
+    body = await request.json()
     try:
         intent_name = body["queryResult"]["intent"]["displayName"]
         params = body["queryResult"]["parameters"]
@@ -108,22 +110,7 @@ async def process_dialogflow(body):
         return JSONResponse({
             "fulfilmentText": f"Someting went wrong processing your request.{results}"
         })
-   
-@app.post("/dialogflow/webhook")
-async def dialogflow_webhook(request: Request, background_tasks: BackgroundTasks):
-    body = await request.json()
-    background_tasks.add_task(process_dialogflow, body)
 
-    # Respond immediately so Dialogflow doesn’t time out
-    #return JSONResponse(content={
-     #   "fulfillmentMessages": [
-      #      {
-       #         "text": {
-        #            "text": ["Got it! Looking up places for you... 🍽️"]
-         #       }
-          #  }
-        #]
-    #})
 
 
 
