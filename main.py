@@ -37,15 +37,6 @@ async def geocode(location:str):
 
     return None
 
-async def get_location_from_ip_address(ip: str):
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(f"https://ipinfo.io/{ip}/json")
-    data = resp.json()
-    if "loc" not in data:
-        return None
-    lat, lon = map(float, data["loc"].split(","))
-    return lat,lon
-
 @app.get("/")
 async def root():
     return {"message":"Welcome to ChowBot! Search to find places to eat"}
@@ -60,17 +51,9 @@ async def dialogflow_webhook(request: Request):
         params = body["queryResult"]["parameters"]
         cuisine = params["cuisine"]
         location = f"{params['location']['street-address']},{params['location']['business-name']}{params['location']['subadmin-area']}{params['location']['city']},{params['location']['country']}"
-
-        if not location:
-
-            user_ip = request.client.host
-            coords = await get_location_from_ip_address(user_ip)
-            lat, lon = coords["latitude"], coords["longitude"]
-
-        else:    
-            
-            coords = await geocode(location)
-            lat, lon = coords
+ 
+        coords = await geocode(location)
+        lat, lon = coords
 
         if not coords:
 
