@@ -47,7 +47,7 @@ async def geocode(location:str):
 async def root():
     return {"message":"Welcome to ChowBot! Search to find places to eat"}
 
-app.post("/dialogflow/webhook")
+@app.post("/dialogflow/webhook")
 async def dialogflow_webhook(request: Request):
 
     body = await request.json()
